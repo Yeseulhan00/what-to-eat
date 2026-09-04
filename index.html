@@ -55,21 +55,6 @@
   .tray h2{font-size:19px;font-weight:700;margin:0 0 4px;}
   .tray .hint{margin:0 0 18px;font-size:14px;color:var(--muted);}
 
-  /* 이름 검색 */
-  .searchbox{position:relative;display:flex;align-items:center;}
-  .searchbox .mag{position:absolute;left:14px;font-size:15px;pointer-events:none;opacity:.55;}
-  .searchbox input{appearance:none;font:inherit;width:100%;background:var(--paper);color:var(--ink);
-    border:1.5px solid var(--edge);border-radius:12px;padding:13px 44px 13px 40px;font-size:15px;}
-  .searchbox input::placeholder{color:var(--muted);}
-  .searchbox input::-webkit-search-cancel-button{display:none;}
-  .searchbox input:focus{outline:none;border-color:var(--pine);}
-  .searchbox input:focus-visible{outline:3px solid var(--mustard);outline-offset:2px;}
-  .searchclear{position:absolute;right:8px;appearance:none;font:inherit;cursor:pointer;
-    background:none;border:none;color:var(--muted);font-size:14px;line-height:1;padding:8px 10px;border-radius:999px;}
-  .searchclear:hover{color:var(--ink);}
-  .searchclear[hidden]{display:none;}
-  .tray .searchnote{margin:12px 0 0;color:var(--pine);}
-
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
   .pick{appearance:none;font:inherit;cursor:pointer;background:var(--paper);
     border:1.5px solid var(--edge);border-radius:12px;padding:14px 8px 12px;text-align:center;color:var(--ink);
@@ -197,18 +182,6 @@
   </header>
 
   <main class="board">
-    <section class="tray">
-      <h2>이름으로 찾기</h2>
-      <p class="hint">먹고 싶은 요리가 이미 정해졌다면 이름을 바로 검색하세요.</p>
-      <div class="searchbox">
-        <span class="mag" aria-hidden="true">🔍</span>
-        <input id="searchInput" type="search" autocomplete="off" spellcheck="false"
-               placeholder="예: 김치찌개, 파스타, 국수" aria-label="요리 이름으로 검색">
-        <button class="searchclear" id="searchClear" type="button" aria-label="검색어 지우기" hidden>✕</button>
-      </div>
-      <p class="hint searchnote" id="searchNote" hidden>검색 중에는 아래 재료와 종류 선택을 잠시 무시합니다.</p>
-    </section>
-
     <section class="tray">
       <h2>가진 재료</h2>
       <p class="hint">지금 집에 있는 주재료 하나를 고르세요.</p>
@@ -711,7 +684,6 @@ R('치즈','일식','치즈 돈카츠','🍖',35,'보통',0,'치즈가 새지 �
 
 /* ── 상태 ──────────────────────────── */
 let selIng=null, selCui=null, selSpice='all', selTime='all';
-let query='';
 const MAX=9;
 
 const ingGrid=document.getElementById('ingGrid');
@@ -727,29 +699,26 @@ const extraCards=document.getElementById('extraCards');
 const emptyBox=document.getElementById('emptyBox');
 const resultsTitle=document.getElementById('resultsTitle');
 const resultsCount=document.getElementById('resultsCount');
-const searchInput=document.getElementById('searchInput');
-const searchClear=document.getElementById('searchClear');
-const searchNote=document.getElementById('searchNote');
 
 INGREDIENTS.forEach(it=>{
   const b=document.createElement('button');
   b.type='button';b.className='pick';b.setAttribute('aria-pressed','false');b.dataset.value=it.id;
   b.innerHTML=`<span class="icon" aria-hidden="true">${it.icon}</span><span class="label">${it.id}</span>`;
-  b.addEventListener('click',()=>{clearSearch();selIng=(selIng===it.id)?null:it.id;render();});
+  b.addEventListener('click',()=>{selIng=(selIng===it.id)?null:it.id;render();});
   ingGrid.appendChild(b);
 });
 CUISINES.forEach(it=>{
   const b=document.createElement('button');
   b.type='button';b.className='pick';b.setAttribute('aria-pressed','false');b.dataset.value=it.id;
   b.innerHTML=`<span class="label">${it.id}</span><span class="sub">${it.sub}</span>`;
-  b.addEventListener('click',()=>{clearSearch();selCui=(selCui===it.id)?null:it.id;render();});
+  b.addEventListener('click',()=>{selCui=(selCui===it.id)?null:it.id;render();});
   cuiGrid.appendChild(b);
 });
 function buildChips(box,list,getter,setter){
   list.forEach(it=>{
     const b=document.createElement('button');
     b.type='button';b.className='chip';b.textContent=it.label;b.dataset.value=String(it.id);
-    b.addEventListener('click',()=>{clearSearch();setter(it.id);render();});
+    b.addEventListener('click',()=>{setter(it.id);render();});
     box.appendChild(b);
   });
 }
@@ -789,93 +758,8 @@ function fillCards(box,list,badgeFn){
   });
 }
 
-/* ── 이름 검색 ─────────────────────── */
-/* 자주 쓰는 다른 표기를 실제 메뉴 이름으로 바꿔준다 */
-const ALIAS={'돈까스':'돈카츠','왕돈까스':'돈카츠','치즈돈까스':'치즈 돈카츠','오무라이스':'오므라이스',
- '자장면':'짜장면','카르보나라':'까르보나라','떡뽁이':'떡볶이','라면':'라멘'};
-
-/* 입력한 검색어를 화면에 넣기 전에 이스케이프한다 */
-const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-/* 공백과 대소문자를 지워 느슨하게 비교한다 */
-const norm=t=>String(t).toLowerCase().replace(/\s+/g,'');
-
-function expandQuery(q){
-  const n=norm(q);
-  for(const [from,to] of Object.entries(ALIAS)){
-    if(n.includes(norm(from))) return norm(n.replace(new RegExp(from,'g'),to));
-  }
-  return n;
-}
-
-function searchRecipes(q){
-  const n=expandQuery(q);
-  if(!n) return {byName:[],byIngredient:[]};
-  const byName=RECIPES.filter(r=>norm(r.name).includes(n));
-  const named=new Set(byName.map(r=>r.name));
-  /* 이름 다음으로는 재료 목록에서 찾는다 - 애호박, 굴소스 같은 검색어를 위해 */
-  const byIngredient=RECIPES.filter(r=>!named.has(r.name)&&
-    (norm(r.ing).includes(n)||norm(r.cui).includes(n)||r.ingredients.some(i=>norm(i).includes(n))));
-  return {byName,byIngredient};
-}
-
-function clearSearch(){
-  if(!query && !searchInput.value) return;
-  query='';
-  searchInput.value='';
-  searchClear.hidden=true;
-  searchNote.hidden=true;
-}
-
-function renderSearch(){
-  const {byName,byIngredient}=searchRecipes(query);
-  const extra=byIngredient.slice(0,MAX);
-  const total=byName.length+extra.length;
-
-  statusEl.innerHTML=`<em>${esc(query)}</em> 검색 결과`;
-  resultsTitle.textContent=`'${query}' 검색`;
-  resultsCount.textContent=total?`${total}가지`:'';
-
-  fillCards(mainCards,byName);
-  mainCards.hidden=byName.length===0;
-
-  if(extra.length){
-    extraWrap.hidden=false;
-    extraLabel.textContent=byName.length
-      ? '재료나 종류에 검색어가 들어간 요리도 같이 보여드려요.'
-      : '같은 이름의 요리는 없지만, 재료에 들어가는 요리를 찾았어요.';
-    fillCards(extraCards,extra);
-  }else{
-    extraWrap.hidden=true;
-  }
-
-  emptyBox.innerHTML = total ? '' :
-    `<div class="empty"><strong>'${esc(query)}'로 찾은 요리가 없어요.</strong>이름 일부만 넣어보거나, 아래에서 재료로 골라보세요.</div>`;
-  results.hidden=false;
-}
-
-searchInput.addEventListener('input',()=>{
-  query=searchInput.value.trim();
-  searchClear.hidden=!searchInput.value;
-  searchNote.hidden=!query;
-  render();
-});
-/* 결과가 하나뿐이면 엔터로 바로 연다 */
-searchInput.addEventListener('keydown',e=>{
-  if(e.key!=='Enter'||!query) return;
-  const {byName}=searchRecipes(query);
-  if(byName.length===1) openSheet(byName[0].name);
-  else results.scrollIntoView({behavior:'smooth',block:'start'});
-});
-searchClear.addEventListener('click',()=>{
-  clearSearch();
-  render();
-  searchInput.focus();
-});
-
 function render(){
   syncControls();
-  if(query){ renderSearch(); return; }
   if(!selIng||!selCui){
     results.hidden=true;
     if(!selIng&&!selCui) statusEl.textContent='재료와 종류를 고르면 요리를 보여드려요.';
@@ -963,13 +847,13 @@ window.addEventListener('popstate',()=>{
 });
 
 document.getElementById('resetBtn').addEventListener('click',()=>{
-  clearSearch();selIng=null;selCui=null;selSpice='all';selTime='all';render();
+  selIng=null;selCui=null;selSpice='all';selTime='all';render();
   window.scrollTo({top:0,behavior:'smooth'});
 });
 document.getElementById('randomBtn').addEventListener('click',()=>{
   const pool=RECIPES.filter(passFilter);
   const pick=(pool.length?pool:RECIPES)[Math.floor(Math.random()*(pool.length||RECIPES.length))];
-  clearSearch();selIng=pick.ing;selCui=pick.cui;render();
+  selIng=pick.ing;selCui=pick.cui;render();
   results.scrollIntoView({behavior:'smooth',block:'start'});
 });
 

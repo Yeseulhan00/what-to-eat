@@ -4,6 +4,5 @@
 
 - 라이브: https://yeseulhan00.github.io/what-to-eat/
 - 재료 10종 × 종류 4종, 조합마다 3개 이상으로 총 123개 레시피
-- 요리 이름으로 검색 가능 (이름이 없으면 재료에서도 찾는다)
 - 홈 화면에 추가하면 앱처럼 실행된다 (`site.webmanifest`, `icons/`)
 - 외부 의존성 없음 (Google Fonts만 사용), `index.html` 하나로 동작
