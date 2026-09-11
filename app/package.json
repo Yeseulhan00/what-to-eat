@@ -1,0 +1,20 @@
+{
+  "name": "what-to-eat-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "오늘 뭐 먹지 - 안드로이드 앱 껍데기",
+  "type": "module",
+  "scripts": {
+    "sync": "node sync-web.mjs && cap sync android",
+    "open": "cap open android"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.1"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.1"
+  }
+}

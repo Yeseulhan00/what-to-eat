@@ -1,0 +1,17 @@
+node_modules/
+www/
+
+# 안드로이드 빌드 산출물
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/capacitor-cordova-android-plugins/
+
+# 서명 키와 비밀번호는 절대 커밋하지 않는다
+*.keystore
+*.jks
+keystore.properties

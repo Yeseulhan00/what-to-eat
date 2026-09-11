@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.yeseulhan00.whattoeat",
+  "appName": "오늘 뭐 먹지",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
