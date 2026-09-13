@@ -15,7 +15,7 @@ AAB로 올리면 Play 앱 서명이 적용된다. 구글이 실제 서명 키를
 번거로운 절차이므로 비밀번호와 함께 안전한 곳에 백업해 둘 것.
 
 ```bash
-keytool -genkeypair -v -keystore C:/Users/user/.android/what-to-eat.keystore -alias what-to-eat -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkeypair -v -keystore C:/Users/user/.android/what-to-eat-release.keystore -alias what-to-eat -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 물어보는 것들: 비밀번호(2번), 이름/조직/도시/국가(대충 적어도 되지만 국가는 `KR`).
@@ -27,7 +27,7 @@ keytool -genkeypair -v -keystore C:/Users/user/.android/what-to-eat.keystore -al
 그다음 `android/` 폴더에 `keystore.properties`를 만든다:
 
 ```properties
-storeFile=C:/Users/user/.android/what-to-eat.keystore
+storeFile=C:/Users/user/.android/what-to-eat-release.keystore
 storePassword=아까_입력한_비밀번호
 keyAlias=what-to-eat
 keyPassword=아까_입력한_비밀번호
@@ -169,9 +169,11 @@ https://yeseulhan00.github.io/what-to-eat/privacy.html
 
 ## 남은 체크리스트
 
-- [ ] `privacy.html`의 연락처 이메일을 실제 주소로 교체 (지금은 `your-email@example.com`)
+- [x] `privacy.html`의 연락처 이메일 교체 완료 (hys6588@gmail.com)
 - [ ] Play Console 개발자 계정 등록 ($25, 본인 확인)
-- [ ] 서명 키 생성 및 백업
+- [x] 서명 키 생성 완료 (`C:/Users/user/.android/what-to-eat-release.keystore`)
+- [ ] **키스토어 파일과 비밀번호를 이 PC 바깥에 백업**
+- [x] 서명된 AAB 빌드 완료 (`오늘-뭐-먹지-1.0.0.aab`, 서명 검증 통과)
 - [ ] 내부 테스트 트랙에 AAB 업로드해서 실기기 확인
 - [ ] 개인 계정이면 프로덕션 신청 전 테스터 12명 × 14일 연속 요건 확인
       (정책이 바뀌었을 수 있으니 콘솔 안내를 따를 것)
