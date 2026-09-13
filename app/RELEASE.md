@@ -114,7 +114,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 회원가입이 없습니다. 로그인도 없습니다.
 광고를 넣지 않았고, 개인정보를 일절 수집하지 않습니다.
 앱이 인터넷에 연결하는 일 자체가 없습니다.
-요청하는 권한도 하나도 없습니다.
+위치, 카메라, 연락처 같은 권한은 하나도 요청하지 않습니다.
 ```
 
 ### 카테고리
@@ -145,6 +145,17 @@ https://yeseulhan00.github.io/what-to-eat/privacy.html
 | `screenshots/*.png` | 휴대전화 스크린샷 | 2장 이상 필요 |
 
 ---
+
+## 인터넷 권한에 대하여
+
+매니페스트에 `android.permission.INTERNET`이 선언돼 있다. Capacitor가 기본으로
+넣는 항목이고, 앱이 실제로 외부와 통신하지는 않는다 (모든 자산이 앱 안에 있고,
+네트워크를 끊은 상태에서 외부 요청 0건을 확인했다).
+
+이 권한을 빼도 앱이 동작하는지는 **아직 확인하지 않았다.** Capacitor는 앱 화면을
+`https://localhost`로 띄우는데, 이게 권한 없이도 되는지 실기기에서 검증이 필요하다.
+빼고 싶다면 `android/app/src/main/AndroidManifest.xml`에서 해당 줄을 지우고
+반드시 실기기에서 앱이 정상적으로 뜨는지 확인할 것. 안 뜨면 되돌리면 된다.
 
 ## 남은 체크리스트
 
