@@ -9,26 +9,36 @@
 
 ## 1. 서명 키 만들기 (최초 1회, 직접 실행)
 
-**이 파일을 잃어버리면 앱 업데이트를 영영 못 한다.** 비밀번호와 함께
-안전한 곳에 따로 백업해 둘 것.
+AAB로 올리면 Play 앱 서명이 적용된다. 구글이 실제 서명 키를 보관하고,
+여기서 만드는 키는 **업로드 키** 역할을 한다. 잃어버려도 구글에 재설정을
+요청할 수 있어 앱이 영영 막히지는 않는다. 다만 재설정은 며칠 걸리는
+번거로운 절차이므로 비밀번호와 함께 안전한 곳에 백업해 둘 것.
 
 ```bash
-keytool -genkeypair -v -keystore what-to-eat.keystore -alias what-to-eat -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkeypair -v -keystore C:/Users/user/.android/what-to-eat.keystore -alias what-to-eat -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 물어보는 것들: 비밀번호(2번), 이름/조직/도시/국가(대충 적어도 되지만 국가는 `KR`).
 
-만들어진 `what-to-eat.keystore`를 `android/` 폴더에 두고,
-같은 폴더에 `keystore.properties`를 만든다:
+키 파일은 저장소 바깥이면 어디든 좋다. `.android/`는 SDK 도구가 관리하는
+폴더라 Studio 문제를 고치려고 통째로 지우는 일이 가끔 있으니, 백업만
+따로 챙겨두면 된다.
+
+그다음 `android/` 폴더에 `keystore.properties`를 만든다:
 
 ```properties
-storeFile=what-to-eat.keystore
+storeFile=C:/Users/user/.android/what-to-eat.keystore
 storePassword=아까_입력한_비밀번호
 keyAlias=what-to-eat
 keyPassword=아까_입력한_비밀번호
 ```
 
-두 파일 모두 `.gitignore`에 들어 있어 커밋되지 않는다. 확인:
+- 경로는 절대경로도 되고, `android/` 기준 상대경로도 된다
+- **역슬래시 대신 슬래시(`/`)를 쓸 것.** properties 파일에서 `\`는
+  이스케이프 문자라 `\Users`가 깨진 유니코드로 읽힌다
+
+`keystore.properties`와 `*.keystore`는 `.gitignore`에 들어 있어 커밋되지
+않는다. 확인:
 
 ```bash
 git status --short
