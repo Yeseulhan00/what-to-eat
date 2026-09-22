@@ -41,6 +41,11 @@
   .topbar{border-bottom:2px solid var(--ink);padding:14px 0;display:flex;justify-content:space-between;
     align-items:baseline;gap:12px;font-size:13px;color:var(--muted);}
   .topbar b{font-weight:700;color:var(--ink);}
+  .topbar .faq{flex:none;color:var(--ink);text-decoration:none;font-weight:700;white-space:nowrap;
+    border:1.5px solid var(--ink);border-radius:999px;padding:5px 13px;line-height:1.4;
+    transition:background .15s,color .15s;}
+  .topbar .faq:hover{background:var(--ink);color:var(--paper);}
+  .topbar .faq:focus-visible{outline:3px solid var(--mustard);outline-offset:2px;}
 
   .hero{padding:52px 0 38px;}
   .hero h1{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
@@ -158,6 +163,8 @@
     .thumb .plate span{font-size:32px;}
   }
   @media (max-width:640px){
+    /* 좁은 화면에서는 설명 문구를 접고 제목과 FAQ만 남긴다 */
+    .topbar .tagline{display:none;}
     .grid,.grid.cuisine{grid-template-columns:repeat(2,1fr);}
     .filters{grid-template-columns:1fr;gap:18px;}
     .cols{grid-template-columns:1fr;gap:22px;padding:20px 18px 26px;}
@@ -176,7 +183,10 @@
 
   <div class="topbar">
     <b>오늘 뭐 먹지</b>
-    <span>냉장고에 있는 재료로 고르는 오늘의 한 끼</span>
+    <span class="tagline">냉장고에 있는 재료로 고르는 오늘의 한 끼</span>
+    <a class="faq" id="faqLink"
+       href="mailto:hys6588@gmail.com?subject=%5B%EC%98%A4%EB%8A%98%20%EB%AD%90%20%EB%A8%B9%EC%A7%80%5D%20%EB%AC%B8%EC%9D%98"
+       title="hys6588@gmail.com으로 메일 보내기">FAQ · 문의</a>
   </div>
 
   <header class="hero">
